@@ -9,9 +9,16 @@ export default async function handler(req,res){
  try{
  const data=typeof req.body==='string'?JSON.parse(req.body):req.body;
  if(!/^[a-f0-9-]{36}$/.test(data?.request_id||''))return json(res,400,{error:'Identificador do pedido inválido'});
- const amount=quote(data.cart),sid=session(req,res);
- const fingerprint=JSON.stringify({cart:data.cart,address:data.address,delivery:data.delivery,customer:data.customer});
- const external_id='srv-'+createHash('sha256').update(sid+data.request_id+fingerprint).digest('hex');
+ const sid=session(req,res);
+ let amount, external_id;
+ if(data?.type==='fee'||data?.is_fee===true){
+  amount=9.90;
+  external_id='srv-fee-'+createHash('sha256').update(sid+data.request_id).digest('hex');
+ }else{
+  amount=quote(data.cart);
+  const fingerprint=JSON.stringify({cart:data.cart,address:data.address,delivery:data.delivery,customer:data.customer});
+  external_id='srv-'+createHash('sha256').update(sid+data.request_id+fingerprint).digest('hex');
+ }
  const transaction=publicTransaction(await createCharge({amount,external_id,description:'Serviço'},process.env.NEXUSPAG_API_KEY));
  if(Number(transaction.amount)!==amount)return json(res,502,{error:'O valor retornado pela NexusPag não confere com o pedido.'});
  return json(res,200,{transaction,access_token:sign({purpose:'pix',id:transaction.id,amount,exp:Date.now()+86400000})});

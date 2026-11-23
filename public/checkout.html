@@ -1548,16 +1548,28 @@ Taxa de embalagem e transporte: <strong>R$ 9,90</strong>, simulada separadamente
                     status.style.color='#1B8F3A';
                     status.style.fontWeight='bold';
                     status.style.fontSize='16px';
+                    status.textContent='Pagamento confirmado! Redirecionando...';
+                    clearInterval(pixTimer);
+                    var cart = getCart();
+                    var subtotal = Number(t.amount) || calcTotal(cart);
+                    var orderData = {
+                        id: pixRequestId || crypto.randomUUID(),
+                        subtotal: subtotal,
+                        fee: 9.90,
+                        total: Math.round((subtotal + 9.90) * 100) / 100,
+                        items: cart.map(function(i){ return { nome: i.nome, quantidade: i.quantidade }; }),
+                        initialPaid: true,
+                        feePaid: false,
+                        step: 0,
+                        customer: checkoutState.customer,
+                        address: checkoutState.address,
+                        createdAt: Date.now()
+                    };
+                    sessionStorage.setItem('quintal_demo_order', JSON.stringify(orderData));
                     try{ localStorage.removeItem('quintalCarrinhoV1'); }catch(_){}
-                    if(typeof Swal !== 'undefined'){
-                        Swal.fire({
-                            title: 'Pagamento Confirmado!',
-                            text: 'Seu pagamento via PIX foi confirmado com sucesso. O restaurante já está preparando o seu pedido!',
-                            icon: 'success',
-                            confirmButtonColor: '#b8121f',
-                            confirmButtonText: 'OK'
-                        });
-                    }
+                    setTimeout(function(){
+                        window.location.href = '/taxa.html';
+                    }, 1200);
                 }
             }
             statusText(t.status);pixPanel.append(title,price,image,code,copy,expires,status);
