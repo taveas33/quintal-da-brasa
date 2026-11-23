@@ -1,0 +1,83 @@
+/* Capa compacta: composição priorizada para celulares. */
+.ap-cover {
+    height: 130px;
+    min-height: 0;
+    background: #130c08;
+    isolation: isolate;
+}
+.ap-cover__photo {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 58%;
+    z-index: -2;
+    background: url('images/banner-quintal.png') no-repeat right 57% / 222% auto;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%);
+    mask-image: linear-gradient(90deg, transparent, #000 24%);
+}
+.ap-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg,#130c08 0%,rgba(19,12,8,.95) 31%,rgba(19,12,8,.55) 51%,transparent 77%);
+}
+.ap-cover__inner {
+    max-width: var(--container-max);
+    height: 100%;
+    margin: 0 auto;
+    padding: 12px 16px 24px;
+    display: flex;
+    align-items: center;
+}
+.ap-cover__copy { width: 66%; max-width: 480px; }
+.ap-cover__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 5px;
+    color: #e9c889;
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+.ap-cover__eyebrow::before { content:''; width:16px; height:1px; background:currentColor; }
+.ap-cover__title {
+    margin: 0;
+    color: #fff0d5;
+    font-size: clamp(24px, 7.2vw, 30px);
+    line-height: .98;
+    font-weight: 900;
+    letter-spacing: -.045em;
+    text-transform: uppercase;
+}
+.ap-cover__title span { display: block; }
+.ap-cover__title em { display: block; margin-top:2px; color:#fa4436; font-style:normal; }
+.ap-cover__subtitle { margin:6px 0 7px; color:#f5e8d8; font-size:11px; line-height:1.2; font-weight:500; }
+.ap-cover__offers { display:flex; flex-wrap:wrap; gap:5px; }
+.ap-cover__offer { display:inline-block; padding:4px 7px; border:1px solid #cfa557; border-radius:4px; color:#f7d99c; font-size:10px; line-height:1; font-weight:700; }
+.ap-cover__offer--red { display:none; }
+.ap-cover__cart { width:34px; height:34px; top:10px; right:10px; background:rgba(19,12,8,.5); border:1px solid rgba(255,255,255,.2); }
+.ap-cover__cart svg { width:19px; height:19px; }
+@media (max-width:479px) {
+    .ap-cover__subtitle { display:none; }
+    .ap-cover__offers { margin-top:7px; }
+}
+@media (min-width:480px) {
+    .ap-cover { height:170px; }
+    .ap-cover__inner { padding:16px 24px 28px; }
+    .ap-cover__title { font-size:36px; }
+    .ap-cover__copy { width:58%; }
+    .ap-cover__eyebrow { font-size:11px; }
+    .ap-cover__subtitle { font-size:12px; }
+}
+@media (min-width:720px) {
+    .ap-cover { height:200px; }
+    .ap-cover__inner { padding:18px 24px 32px; }
+    .ap-cover__title { font-size:44px; }
+    .ap-cover__photo { width:60%; background-position:right 57%; }
+    .ap-cover__subtitle { font-size:14px; }
+    .ap-cover__offer { font-size:11px; padding:5px 9px; }
+    .ap-cover__offer--red { display:inline-block; color:#fff0d5; border-color:rgba(255,240,213,.3); }
+}
