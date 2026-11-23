@@ -88,12 +88,48 @@
  }
  if(page==='status'){
   if(!order.feePaid){location.replace('/taxa.html');return;}
-  if(!enabled){
-   document.querySelectorAll('.demo').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.demo').forEach(e=>e.remove());
+  const nextBtn=document.getElementById('nextDemoStatus');
+  if(nextBtn){
+   const nextMuted=nextBtn.nextElementSibling;
+   if(nextMuted&&nextMuted.classList.contains('muted'))nextMuted.remove();
+   nextBtn.remove();
   }
   const names=['Pedido recebido','Em preparo','Saiu para entrega','Entregue'];
-  const render=()=>{document.getElementById('orderStatus').textContent=names[order.step];document.querySelectorAll('[data-status-step]').forEach(e=>{const step=Number(e.dataset.statusStep);e.classList.toggle('done',step<=order.step);e.setAttribute('aria-current',step===order.step?'step':'false');});document.getElementById('nextDemoStatus').disabled=order.step===3;document.getElementById('nextDemoStatus').textContent=order.step===3?'Simulação concluída':'Simular próxima etapa';};
-  const list=document.getElementById('orderItems');for(const item of order.items){const li=document.createElement('li');li.textContent=item.quantidade+'× '+item.nome;list.append(li);}
-  document.getElementById('nextDemoStatus').onclick=()=>{if(order.step<3){order.step++;write(order);render();}};render();
+  const descs=[
+   'Pagamento confirmado! O restaurante recebeu o seu pedido.',
+   'Seu pedido está sendo preparado na cozinha com todo o capricho.',
+   'O entregador retirou o seu pedido e está a caminho!',
+   'Pedido entregue com sucesso. Bom apetite!'
+  ];
+  if(!order.paidAt){order.paidAt=order.feePaidAt||order.createdAt||Date.now();write(order);}
+  const getStep=()=>{
+   const diffMs=Math.max(0,Date.now()-(order.paidAt||Date.now()));
+   const step=Math.floor(diffMs/(15*60*1000));
+   return Math.min(3,step);
+  };
+  const render=()=>{
+   const step=getStep();
+   const statusEl=document.getElementById('orderStatus');
+   if(statusEl)statusEl.textContent=names[step];
+   const descEl=document.getElementById('statusDesc')||document.querySelector('.status-banner p');
+   if(descEl)descEl.textContent=descs[step];
+   document.querySelectorAll('[data-status-step]').forEach(e=>{
+    const s=Number(e.dataset.statusStep);
+    e.classList.toggle('done',s<=step);
+    e.setAttribute('aria-current',s===step?'step':'false');
+   });
+  };
+  const list=document.getElementById('orderItems');
+  if(list&&Array.isArray(order.items)){
+   list.replaceChildren();
+   for(const item of order.items){
+    const li=document.createElement('li');
+    li.textContent=(item.quantidade||1)+'× '+(item.nome||'Item');
+    list.append(li);
+   }
+  }
+  render();
+  setInterval(render,15000);
  }
 })();
