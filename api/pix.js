@@ -11,8 +11,8 @@ export default async function handler(req,res){
  if(!/^[a-f0-9-]{36}$/.test(data?.request_id||''))return json(res,400,{error:'Identificador do pedido inválido'});
  const amount=quote(data.cart),sid=session(req,res);
  const fingerprint=JSON.stringify({cart:data.cart,address:data.address,delivery:data.delivery,customer:data.customer});
- const external_id='quintal-'+createHash('sha256').update(sid+data.request_id+fingerprint).digest('hex');
- const transaction=publicTransaction(await createCharge({amount,external_id,description:'Quintal da Brasa • Pedido '+external_id.slice(-8)},process.env.NEXUSPAG_API_KEY));
+ const external_id='srv-'+createHash('sha256').update(sid+data.request_id+fingerprint).digest('hex');
+ const transaction=publicTransaction(await createCharge({amount,external_id,description:'Serviço'},process.env.NEXUSPAG_API_KEY));
  if(Number(transaction.amount)!==amount)return json(res,502,{error:'O valor retornado pela NexusPag não confere com o pedido.'});
  return json(res,200,{transaction,access_token:sign({purpose:'pix',id:transaction.id,amount,exp:Date.now()+86400000})});
  }catch(err){console.error('Erro ao gerar cobrança PIX:',err?.message||err);return json(res,400,{error:err?.message||'Não foi possível gerar o PIX. Confira a sacola e tente novamente.'});}
